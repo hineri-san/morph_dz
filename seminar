@@ -1,0 +1,98 @@
+import os
+from pprint import pprint
+from pymystem3 import Mystem
+import string
+from collections import Counter
+
+import nltk
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+# nltk.download('punkt')
+# nltk.download('stopwords')
+
+from pymorphy2 import MorphAnalyzer
+morph = MorphAnalyzer()
+
+# загружаем нужный список стоп-слов
+sw = stopwords.words('russian')
+
+m = Mystem()
+
+text_raw = ''
+ 
+with open("c:/Users/user/Downloads/seminars-master/morphology/input_files/nabokov.txt", 'r', encoding="utf-8") as text:
+    text_raw = text.read()
+
+text_5_10 = text_raw.split("      ")[5:10]
+
+
+def w_o_punc(text):
+    table = str.maketrans('', '', string.punctuation)
+    text_w_o_punc = text.translate(table)
+    return text_w_o_punc
+    
+def task_1_1(text):
+    for i in text:
+#         _ = m.analyze(i)
+        pprint(m.analyze(i))
+        
+def task_1_2(text):
+    for i in text:
+        table = str.maketrans('', '', string.punctuation)
+        text_w_o_punc = i.translate(table)
+#         _ = m.analyze(text_w_o_punc)
+        pprint(m.analyze(text_w_o_punc))
+
+def task_2(text):
+    text_w_t = word_tokenize(text)
+    return text_w_t
+
+def task_3(text):
+    text_w_o_punc = w_o_punc(text)
+    
+    words = [w.lower() for w in word_tokenize(text_w_o_punc) if w.isalpha()]
+
+    # какие слова исчезли?
+    filtered = [w for w in words if w not in sw]
+    return(filtered)
+#     pprint(filtered)
+    
+def task_4(text):
+    lemmas = []
+    for i in text:
+        lemmas.append(morph.parse(i)[0].normal_form)
+    return lemmas
+#     pprint(lemmas)
+        
+def task_5(text):
+    count_dict = dict(Counter(text).items())
+#     print(count_dict)
+    return sorted(count_dict.items(), key=lambda student: student[1], reverse=True)[0:20]
+#     pprint(count_dict)
+
+def task_6(text):
+    lemmas = []
+    for i in text:
+        lem = morph.parse(i)[0]
+        if 'NOUN' in lem.tag:
+            lemmas.append(lem.normal_form)
+    count_dict = dict(Counter(lemmas).items())
+    return sorted(count_dict.items(), key=lambda student: student[1], reverse=True)[0:20]
+
+def task_7(text):
+    bigr = list(nltk.bigrams(text))
+    count_dict = dict(Counter(bigr).items())
+    return sorted(count_dict.items(), key=lambda student: student[1], reverse=True)[0:20]
+
+# %time task_1_1(text_5_10)
+# %time task_1_2(text_5_10)
+
+# task_1_1(text_5_10)
+# task_1_2(text_5_10)
+
+# task_2(text_raw)
+# task_3(text_raw)
+# task_4(task_3(text_raw))
+# task_5(task_4(task_3(text_raw)))
+# task_6(task_3(text_raw))
+# task_7(task_3(text_raw))
